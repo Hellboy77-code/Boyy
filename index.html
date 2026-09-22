@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>BOY Dashboard</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#0b0f14;color:#eef2f7}
+body{overflow-x:hidden}
+.app{min-height:100vh;display:flex}
+.side{width:230px;flex:0 0 230px;background:#111720;border-right:1px solid #27303b;padding:16px;display:flex;flex-direction:column}
+.brand{font-size:23px;font-weight:800;margin-bottom:4px}.brand-sub{font-size:11px;color:#8f9bab;margin-bottom:18px}
+.nav{display:flex;flex-direction:column;gap:7px}
+.nav button{width:100%;border:0;background:transparent;color:#aeb8c5;text-align:left;padding:12px;border-radius:10px;font-size:14px;cursor:pointer}
+.nav button:hover,.nav button.active{background:#1d2733;color:#fff}
+.main{flex:1;min-width:0;padding:18px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.title{font-size:22px;font-weight:800}.user{background:#151d27;border:1px solid #293542;padding:9px 12px;border-radius:10px;font-weight:700}
+.page{display:none}.page.active{display:block}
+.muted{color:#8f9bab;font-size:13px}
+.hero,.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.grid5 input{min-width:0}
+.card{background:#121922;border:1px solid #27303b;border-radius:14px;padding:16px}
+.hero{margin-bottom:14px}.hero h1{margin:0 0 7px;font-size:22px}.hero p{margin:0;color:#aab4c0}
+.start{margin-top:14px;border:0;border-radius:12px;padding:13px 18px;background:#fff;color:#0b0f14;font-weight:800;cursor:pointer}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.stat b{display:block;font-size:25px;margin-top:5px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:16px 0 10px}
+.section-head h2{font-size:18px;margin:0}
+.add{border:1px solid #344150;background:#1a2430;color:#fff;padding:10px 13px;border-radius:10px;font-weight:700;cursor:pointer}
+.table-wrap{overflow:auto;border:1px solid #27303b;border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:760px;background:#121922}
+th,td{padding:11px 12px;border-bottom:1px solid #27303b;text-align:left;font-size:12px;vertical-align:top}
+th{color:#8f9bab;font-weight:700;background:#101720;position:sticky;top:0}
+.badge{display:inline-block;padding:5px 8px;border-radius:999px;background:#1d3a2a;color:#9fe0b4;font-size:11px}
+.badge.off{background:#3a2525;color:#ffb0b0}
+.action{display:flex;gap:6px;flex-wrap:wrap}.small{border:1px solid #344150;background:#1a2430;color:#fff;border-radius:8px;padding:7px 9px;font-size:11px;cursor:pointer}
+.note{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.note:last-child{margin-bottom:0}
+.note-left{min-width:0}.note-title{font-weight:800;margin-bottom:4px}.note-text{color:#9da8b5;font-size:12px}
+.options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.option{border:1px solid #2b3642;background:#151e28;padding:14px;border-radius:11px;cursor:pointer}
+.option input{margin-right:7px}
+.save{margin-top:12px;border:0;background:#fff;color:#0b0f14;padding:11px 15px;border-radius:10px;font-weight:800;cursor:pointer}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal.show{display:flex}
+.modal-box{width:min(520px,100%);background:#121922;border:1px solid #2b3642;border-radius:14px;padding:16px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.modal-head h3{margin:0}.close{background:none;border:0;color:#fff;font-size:24px;cursor:pointer}
+label{display:block;font-size:12px;color:#aab4c0;margin:10px 0 5px}
+input[type=text],input[type=url],input[type=time]{width:100%;padding:11px;border-radius:9px;border:1px solid #344150;background:#0d141c;color:#fff;outline:none}
+.checks{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0}.checks label{margin:0;color:#fff}
+@media(max-width:800px){
+  .app{display:block}
+  .side{width:100%;height:auto;min-height:0;padding:9px 8px;border-right:0;border-bottom:1px solid #27303b}
+  .brand{font-size:18px;display:inline-block}.brand-sub{display:inline;font-size:10px;margin-left:6px}
+  .nav{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:8px}
+  .nav button{padding:9px 3px;text-align:center;font-size:10px;line-height:1.15}
+  .main{padding:10px 9px}
+  .grid5{grid-template-columns:1fr}
+  .top{margin-bottom:10px}.title{font-size:18px}.user{padding:7px 9px;font-size:12px}
+  .hero{padding:13px}.hero h1{font-size:19px}.hero p{font-size:12px}
+  .start{width:100%;margin-top:12px}
+  .stats{grid-template-columns:repeat(2,1fr);gap:8px}.stat{padding:12px}.stat b{font-size:21px}
+  .stats .stat:last-child{grid-column:1/-1}
+  .section-head{align-items:flex-start}.section-head h2{font-size:17px}
+  .add{padding:8px 10px;font-size:11px}
+  .options{grid-template-columns:1fr 1fr}
+  .note{align-items:flex-start;flex-direction:column}
+  .note .action{width:100%}.note .small{flex:1}
+}
+.danger{background:#ff5b5b!important;color:#fff!important;border-color:#ff5b5b!important;}\n</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">☠️ BOY</div><span class="brand-sub">Auto Comment Dashboard</span>
+    <nav class="nav">
+      <button class="active" onclick="showPage('home',this)">🏠<br>Beranda</button>
+      <button onclick="showPage('group',this)">👥<br>Group</button>
+      <button onclick="showPage('notice',this)">🔔<br>Notifikasi</button>
+      <button onclick="showPage('interval',this)">◷<br>Interval</button>
+      <button onclick="showPage('trigger',this)">⚡<br>Pemicu Bot</button>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="top"><div class="title">Boy Dashboard</div><div class="user">🤖 BOY</div></div>
+
+    <section id="home" class="page active">
+      <div class="hero">
+        <h1>Selamat datang di Dashboard Boy</h1>
+        <p>Kelola bot, group, jadwal, notifikasi, dan interval dari satu dashboard.</p>
+        <button class="start" onclick="toggleMainBot(this)">▶ START BOT</button>
+      </div>
+      <div class="stats">
+        <div class="card stat"><span class="muted">Total Group</span><b id="statGroups">0</b></div>
+        <div class="card stat"><span class="muted">Berhasil</span><b id="statSuccess">0</b></div>
+        <div class="card stat"><span class="muted">Pending</span><b id="statPending">0</b></div>
+        <div class="card stat"><span class="muted">Gagal</span><b id="statFailed">0</b></div>
+      </div>
+      <div class="card" style="margin-top:12px"><b>Bot Status</b><div class="muted" style="margin-top:6px">● Aktif — Bot siap dijalankan.</div></div>
+    </section>
+
+    <section id="group" class="page">
+      <div class="section-head"><div><h2>Group</h2><div class="muted">Kelola group dan pengaturan komentar bot</div></div><button class="add" onclick="openModal('groupModal')">＋ Tambah Group</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Nama Group</th><th>URL Group</th><th>Komentar Bot</th><th>OCR</th><th>Teks</th><th>Waktu Jadwal</th><th>Status</th><th>Aksi</th></tr></thead>
+      <tbody><tr><td>Group Demo</td><td>facebook.com/groups/demo</td><td>Halo, ini komentar BOY.</td><td>ON</td><td>ON</td><td>09:00</td><td><span class="badge">Aktif</span></td><td><div class="action"><button class="small" onclick="showComment('Group Demo')">Lihat Komentar</button><button class="small" onclick="editGroup(this)">Edit</button><button class="small danger" onclick="deleteGroup(this)">Hapus</button></div></td></tr>
+      <tr><td>Group Contoh</td><td>facebook.com/groups/contoh</td><td>Terima kasih informasinya.</td><td>OFF</td><td>ON</td><td>19:30</td><td><span class="badge off">Nonaktif</span></td><td><div class="action"><button class="small" onclick="showComment('Group Contoh')">Lihat Komentar</button><button class="small" onclick="editGroup(this)">Edit</button><button class="small danger" onclick="deleteGroup(this)">Hapus</button></div></td></tr></tbody></table></div>
+    </section>
+
+    <section id="notice" class="page">
+      <div class="section-head"><div><h2>Notifikasi</h2><div class="muted">Gagal, pending, dan berhasil.</div></div></div>
+      <div class="card">
+        <div class="note"><div class="note-left"><div class="note-title">❌ Gagal — Group Demo</div><div class="note-text">Bot gagal menjalankan tugas.</div></div><div class="action"><button class="small" onclick="showComment('Group Demo')">Lihat Komentar</button><button class="small botAction" onclick="toggleBotButton(this)">START BOT</button></div></div>
+        <div class="note"><div class="note-left"><div class="note-title">⏳ Pending — Group Contoh</div><div class="note-text">Menunggu jadwal berikutnya.</div></div><div class="action"><button class="small" onclick="showComment('Group Contoh')">Lihat Komentar</button><button class="small botAction" onclick="toggleBotButton(this)">START BOT</button></div></div>
+        <div class="note"><div class="note-left"><div class="note-title">✅ Berhasil — Group Demo</div><div class="note-text">Tugas bot selesai.</div></div><div class="action"><button class="small" onclick="showComment('Group Demo')">Lihat Komentar</button><button class="small botAction" onclick="toggleBotButton(this)">START BOT</button></div></div>
+      </div>
+    </section>
+
+    <section id="trigger" class="page">
+      <div class="section-head"><div><h2>⚡ Pemicu Bot</h2><div class="muted">5 kolom pemicu bot. Kosong secara default.</div></div></div>
+      <div class="card">
+        <div class="grid5">
+          <input placeholder="Pemicu 1">
+          <input placeholder="Pemicu 2">
+          <input placeholder="Pemicu 3">
+          <input placeholder="Pemicu 4">
+          <input placeholder="Pemicu 5">
+        </div>
+        <button class="save" onclick="saveTriggers()">Simpan Pemicu</button>
+        <div id="triggerMsg" class="muted" style="margin-top:9px"></div>
+      </div>
+    </section>
+
+    <section id="interval" class="page">
+      <div class="section-head"><div><h2>Interval</h2><div class="muted">Pilih interval auto refresh.</div></div></div>
+      <div class="card"><div class="options">
+        <label class="option"><input type="radio" name="interval" value="30 detik">30 detik</label>
+        <label class="option"><input type="radio" name="interval" value="2 menit">2 menit</label>
+        <label class="option"><input type="radio" name="interval" value="5 menit">5 menit</label>
+        <label class="option"><input type="radio" name="interval" value="7 menit">7 menit</label>
+        <label class="option"><input type="radio" name="interval" value="10 menit">10 menit</label>
+        <label class="option"><input type="radio" name="interval" value="15 menit">15 menit</label>
+      </div><button class="save" onclick="saveInterval()">Simpan Interval</button><div id="intervalMsg" class="muted" style="margin-top:9px"></div></div>
+    </section>
+  </main>
+</div>
+
+<div id="groupModal" class="modal"><div class="modal-box"><div class="modal-head"><h3>Tambah Group</h3><button class="close" onclick="closeModal('groupModal')">×</button></div>
+<form onsubmit="saveGroup(event)"><label>Nama Group</label><input id="groupName" required type="text"><label>URL Group</label><input id="groupUrl" required type="url" placeholder="https://facebook.com/groups/..."><label>Komentar Bot</label><input id="groupComment" required type="text" placeholder="Tulis komentar bot"><label>Waktu Jadwal</label><input id="groupTime" required type="time" value="09:00"><div class="checks"><label><input id="groupOcr" type="checkbox" checked> OCR ON</label><label><input id="groupText" type="checkbox" checked> Teks ON</label><label><input id="groupActive" type="checkbox" checked> Aktif</label></div><button class="save" id="groupSaveBtn" type="submit">Simpan Group</button></form></div></div>
+
+
+
+<script>
+function updateStats(){
+ const groupRows=document.querySelectorAll('#group table tbody tr').length;
+ const notes=[...document.querySelectorAll('#notice .note')].map(n=>n.textContent.toLowerCase());
+ const success=notes.filter(n=>n.includes('berhasil')).length;
+ const pending=notes.filter(n=>n.includes('pending')).length;
+ const failed=notes.filter(n=>n.includes('gagal')).length;
+ document.getElementById('statGroups').textContent=groupRows;
+ document.getElementById('statSuccess').textContent=success;
+ document.getElementById('statPending').textContent=pending;
+ document.getElementById('statFailed').textContent=failed;
+}
+
+function showPage(id,btn){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+ btn.classList.add('active');
+ window.scrollTo(0,0);
+}
+let botRunning=false;
+function startBot(){
+ botRunning=true;
+ document.querySelectorAll('.start,.botAction').forEach(b=>{b.disabled=false;b.innerHTML='⏹ STOP BOT';b.style.background='#ff5b5b';b.style.color='#fff';});
+ const status=document.querySelector('#home .card:last-child .muted');
+ if(status) status.innerHTML='● Bot sedang berjalan — tekan STOP BOT untuk menghentikan.';
+}
+function stopBot(){
+ botRunning=false;
+ document.querySelectorAll('.start,.botAction').forEach(b=>{b.disabled=false;b.innerHTML='▶ START BOT';b.style.background='#fff';b.style.color='#0b0f14';});
+ const status=document.querySelector('#home .card:last-child .muted');
+ if(status) status.innerHTML='● Bot berhenti — siap dijalankan kembali.';
+}
+function toggleBotButton(btn){if(botRunning){stopBot();}else{startBot();}}
+function toggleMainBot(btn){if(botRunning){stopBot();}else{startBot();}}
+function showComment(group){alert('Komentar bot untuk '+group+':\n\nHalo, ini komentar BOY.');}
+function openModal(id){document.getElementById(id).classList.add('show')}
+function closeModal(id){
+ document.getElementById(id).classList.remove('show');
+ if(id==='groupModal') resetGroupForm();
+}
+let editingRow=null;
+function resetGroupForm(){
+ const f=document.querySelector('#groupModal form');
+ if(!f)return;
+ f.reset();
+ document.getElementById('groupTime').value='09:00';
+ document.querySelector('#groupModal h3').textContent='Tambah Group';
+ document.getElementById('groupSaveBtn').textContent='Simpan Group';
+ editingRow=null;
+}
+function editGroup(btn){
+ editingRow=btn.closest('tr');
+ const c=editingRow.cells;
+ document.getElementById('groupName').value=c[0].textContent.trim();
+ document.getElementById('groupUrl').value=c[1].textContent.trim().startsWith('http')?c[1].textContent.trim():'https://'+c[1].textContent.trim();
+ document.getElementById('groupComment').value=c[2].textContent.trim();
+ document.getElementById('groupTime').value=c[5].textContent.trim();
+ document.getElementById('groupOcr').checked=c[3].textContent.trim().toUpperCase()==='ON';
+ document.getElementById('groupText').checked=c[4].textContent.trim().toUpperCase()==='ON';
+ document.getElementById('groupActive').checked=c[6].textContent.trim().toLowerCase()==='aktif';
+ document.querySelector('#groupModal h3').textContent='Edit Group';
+ document.getElementById('groupSaveBtn').textContent='Simpan Perubahan';
+ openModal('groupModal');
+}
+function deleteGroup(btn){
+ const row=btn.closest('tr');
+ const name=row.cells[0].textContent.trim();
+ if(confirm('Hapus group "'+name+'"?')){row.remove();updateStats();}
+}
+function saveGroup(e){
+ e.preventDefault();
+ const name=document.getElementById('groupName').value.trim();
+ const url=document.getElementById('groupUrl').value.trim().replace(/^https?:\/\//,'');
+ const comment=document.getElementById('groupComment').value.trim();
+ const time=document.getElementById('groupTime').value;
+ const ocr=document.getElementById('groupOcr').checked;
+ const txt=document.getElementById('groupText').checked;
+ const active=document.getElementById('groupActive').checked;
+ const status=active?'<span class="badge">Aktif</span>':'<span class="badge off">Nonaktif</span>';
+ if(editingRow){
+   editingRow.cells[0].textContent=name;
+   editingRow.cells[1].textContent=url;
+   editingRow.cells[2].textContent=comment;
+   editingRow.cells[3].textContent=ocr?'ON':'OFF';
+   editingRow.cells[4].textContent=txt?'ON':'OFF';
+   editingRow.cells[5].textContent=time;
+   editingRow.cells[6].innerHTML=status;
+   editingRow=null;
+ }else{
+   const tbody=document.querySelector('#group table tbody');
+   const row=document.createElement('tr');
+   row.innerHTML=`<td>${name}</td><td>${url}</td><td>${comment}</td><td>${ocr?'ON':'OFF'}</td><td>${txt?'ON':'OFF'}</td><td>${time}</td><td>${status}</td><td><div class="action"><button class="small" onclick="showComment(this.closest('tr').cells[0].textContent)">Lihat Komentar</button><button class="small" onclick="editGroup(this)">Edit</button><button class="small danger" onclick="deleteGroup(this)">Hapus</button></div></td>`;
+   tbody.appendChild(row);
+ }
+ closeModal('groupModal');
+ updateStats();
+}
+function saveTriggers(){
+ const vals=[...document.querySelectorAll('#trigger input')].map(x=>x.value.trim());
+ document.getElementById('triggerMsg').textContent='Pemicu disimpan (demo).';
+}
+function saveInterval(){
+ const x=document.querySelector('input[name="interval"]:checked');
+ document.getElementById('intervalMsg').textContent=x?'Interval disimpan: '+x.value:'Pilih interval terlebih dahulu.';
+}
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+updateStats();
+</script>
+</body>
+  </html>
