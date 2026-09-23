@@ -260,10 +260,7 @@ function saveInterval(){
 }
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
 updateStats();
-</script>
-</body>
-  </html>
-let botInterval = null;
+  let botInterval = null;
 let isRunning = false;
 
 // Fungsi untuk memulai bot
@@ -338,3 +335,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnStart) btnStart.addEventListener('click', startBot);
     if (btnStop) btnStop.addEventListener('click', stopBot);
 });
+</script>
+</body>
+  </html>
