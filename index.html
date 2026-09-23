@@ -263,3 +263,78 @@ updateStats();
 </script>
 </body>
   </html>
+let botInterval = null;
+let isRunning = false;
+
+// Fungsi untuk memulai bot
+function startBot() {
+    if (isRunning) {
+        alert("Bot sudah berjalan!");
+        return;
+    }
+
+    // Ambil nilai interval dari input di dasbor Anda (misal dalam detik, default 10 detik jika kosong)
+    let intervalDetik = document.getElementById('intervalInput') ? parseInt(document.getElementById('intervalInput').value) || 10 : 10;
+    
+    isRunning = true;
+    console.log("Bot Facebook Dimulai...");
+    alert("Bot Berhasil Dinyalakan!");
+
+    // Jalankan perulangan otomatis sesuai interval
+    botInterval = setInterval(() => {
+        if (!isRunning) return;
+
+        // Ambil data teks komentar dan kata pemicu dari elemen dasbor
+        let teksKomentar = document.getElementById('commentInput') ? document.getElementById('commentInput').value : "Keren Om!";
+        let kataPemicu = document.getElementById('triggerInput') ? document.getElementById('triggerInput').value.toLowerCase() : "";
+
+        console.log("Memeriksa postingan/grup...");
+
+        // Logika simulasi pencarian kata pemicu dan kirim komentar di halaman aktif
+        let postingan = document.querySelectorAll('[role="feed"] [loc="post"], div[data-ad-preview="message"]');
+        
+        postingan.forEach(post => {
+            let isiPost = post.innerText.toLowerCase();
+            
+            // Cek apakah postingan mengandung kata pemicu (jika diisi)
+            if (kataPemicu === "" || isiPost.includes(kataPemicu)) {
+                // Cari kolom komentar di postingan tersebut
+                let kolomKomentar = post.querySelector('div[aria-label="Tulis komentar"], div[aria-label="Tulis komentar publik"]');
+                
+                if (kolomKomentar && !post.getAttribute('data-bot-commented')) {
+                    // Simulasi mengetik dan mengirim komentar
+                    kolomKomentar.focus();
+                    document.execCommand('insertText', false, teksKomentar);
+                    
+                    // Tandai bahwa postingan ini sudah dikomentari agar tidak spam berlebihan
+                    post.setAttribute('data-bot-commented', 'true');
+                    console.log("Komentar terkirim:", teksKomentar);
+                }
+            }
+        });
+
+    }, intervalDetik * 1000); // Konversi detik ke milidetik
+}
+
+// Fungsi untuk menghentikan bot
+function stopBot() {
+    if (!isRunning) {
+        alert("Bot memang sedang tidak aktif.");
+        return;
+    }
+
+    isRunning = false;
+    clearInterval(botInterval);
+    console.log("Bot Facebook Dihentikan.");
+    alert("Bot Berhasil Dimatikan!");
+}
+
+// Sambungkan ke tombol Start dan Stop di HTML Anda
+// (Pastikan ID tombol di HTML Anda masing-undang bernama 'startBtn' dan 'stopBtn')
+document.addEventListener('DOMContentLoaded', () => {
+    const btnStart = document.getElementById('startBtn');
+    const btnStop = document.getElementById('stopBtn');
+
+    if (btnStart) btnStart.addEventListener('click', startBot);
+    if (btnStop) btnStop.addEventListener('click', stopBot);
+});
